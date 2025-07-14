@@ -1,48 +1,26 @@
-import B2 from 'backblaze-b2';
-import formidable from 'formidable';
-import fs from 'fs';
-import stats from '../utils/stats.js';
+const formidable = require('formidable');
+const { uploadToB2 } = require('../utils/b2.js');
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-export default async function handler(req, res) {
+module.exports = async function (req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(405).send('Method Not Allowed');
   }
 
-  const form = new formidable.IncomingForm();
+  const form = formidable({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
-    if (err || !files.file) {
-      return res.status(400).json({ error: 'File upload failed' });
+    if (err) {
+      console.error('Form parse error:', err);
+      return res.status(500).send('Error parsing the form');
     }
 
-    const b2 = new B2({
-      applicationKeyId: process.env.B2_KEY_ID,
-      applicationKey: process.env.B2_APP_KEY,
-    });
-
-    await b2.authorize();
-
-    const fileStream = fs.createReadStream(files.file[0].filepath);
-    const timestamp = `${Date.now()}_${files.file[0].originalFilename}`;
-
-    const uploadUrl = await b2.getUploadUrl({ bucketId: process.env.B2_BUCKET_ID });
-
-    await b2.uploadFile({
-      uploadUrl: uploadUrl.data.uploadUrl,
-      uploadAuthToken: uploadUrl.data.authorizationToken,
-      fileName: timestamp,
-      data: fileStream,
-    });
-
-    const fileUrl = `https://f002.backblazeb2.com/file/${process.env.B2_BUCKET_NAME}/${encodeURIComponent(timestamp)}`;
-    stats.record('uploads');
-
-    res.status(200).json({ url: fileUrl });
+    try {
+      const file = files.file;
+      const result = await uploadToB2(file);
+      res.status(200).json({ url: result.downloadUrl });
+    } catch (error) {
+      console.error('Upload error:', error);
+      res.status(500).send('Failed to upload file');
+    }
   });
-}
+};
