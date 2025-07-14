@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>DropAI Upload</title></head>
+<body>
+  <h1>🌩 DropAI Upload</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <select name="expiry">
+      <option value="1">1 day</option>
+      <option value="7">7 days</option>
+      <option value="30">30+ days</option>
+    </select>
+    <button type="submit">Upload</button>
+  </form>
+  <div id="link"></div>
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const f = new FormData(e.target);
+      const res = await fetch('/api/upload', {method:'POST', body:f});
+      const j = await res.json();
+      document.getElementById('link').innerHTML = j.url ? `<a href="${j.url}" target="_blank">Download Link</a>` : j.error;
+    });
+  </script>
+</body>
+</html>

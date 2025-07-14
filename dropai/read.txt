@@ -1,0 +1,21 @@
+DropAI Setup Guide
+
+1. Place files in structure:
+
+   dropai/
+     ├─ frontend/
+     │    └─ index.html
+     ├─ api/
+     │    └─ upload.js
+     ├─ utils/
+     │    └─ stats.js
+     ├─ .env
+     └─ README.txt
+
+2. Fill in your .env file with real B2 keys
+
+3. Deploy with Vercel (recommended) or run with Express locally
+
+4. Visit /frontend/index.html to test upload
+
+5. Result: File uploads to Backblaze and returns direct link
