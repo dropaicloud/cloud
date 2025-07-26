@@ -1,0 +1,16 @@
+{
+    "timer_type": "interval",
+    "work_duration_minutes": 25,
+    "break_duration_minutes": 5,
+    "cycles": 4,
+    "background_sound": "ocean.wav",
+    "binaural_beat_hz": 9.4,
+    "affirmations": [
+        "You are calm and focused.",
+        "Your mind is clear.",
+        "You are making progress.",
+        "This moment is yours."
+    ],
+    "breathing_pattern": "5s inhale / 5s exhale",
+    "platform": "web + local"
+}

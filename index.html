@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aurora Focus Timer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #0d1117;
+      color: #c9d1d9;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 2.5em;
+    }
+    #timer {
+      font-size: 5em;
+      margin: 20px 0;
+      transition: font-size 0.4s ease;
+    }
+    #timer.large {
+      font-size: 7em;
+    }
+    #affirmation {
+      margin-top: 20px;
+      font-size: 1.4em;
+      opacity: 0.8;
+    }
+    #progressContainer {
+      width: 100%;
+      max-width: 500px;
+      margin: 20px auto;
+      height: 30px;
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+    }
+    #progressBar {
+      width: 0%;
+      height: 100%;
+      background-color: #58a6ff;
+      transition: width 1s linear;
+    }
+    #progressPercent {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.9em;
+      color: #ffffffaa;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #238636;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      margin-right: 10px;
+    }
+    input, select {
+      padding: 5px;
+      font-size: 1em;
+      margin: 5px;
+      width: 60px;
+      text-align: center;
+    }
+      .fullscreen-mode body,
+      .fullscreen-mode #controls,
+      .fullscreen-mode input,
+      .fullscreen-mode select,
+      .fullscreen-mode #affirmation,
+      .fullscreen-mode h1 {
+        display: none !important;
+      }
+
+      .fullscreen-mode #timer {
+        font-size: 10vw;
+        margin-top: 40vh;
+      }
+
+      #exitFullscreenBtn {
+        background: #f00;
+      }
+      #themeBtn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 100;
+        padding: 8px 16px;
+        font-size: 0.9em;
+        background: #333;
+        color: white;
+        border-radius: 4px;
+        opacity: 0.85;
+      }
+
+      body.light-mode #themeBtn {
+        background: #eee;
+        color: #222;
+        border: 1px solid #bbb;
+      }
+
+      body.light-mode {
+        background: #f0f0f0;
+        color: #222;
+      }
+
+      body.light-mode #progressContainer {
+        background: #ccc;
+      }
+
+      body.light-mode #progressBar {
+        background-color: #007acc;
+      }
+
+      body.light-mode .btn {
+        background-color: #0055aa;
+        color: white;
+      }
+
+      body.light-mode select,
+      body.light-mode input {
+        background: #fff;
+        color: #000;
+        border: 1px solid #bbb;
+      }
+      .fullscreen-mode #themeBtn {
+        display: none !important;
+      }
+      body {
+        transition: background 0.1s ease, color 0.1s ease;
+      }
+      #inputFields {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .input-box {
+        background: #161b22;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 130px;
+        transition: background 0.3s ease;
+      }
+
+      .input-box label {
+        font-size: 0.95em;
+        margin-bottom: 5px;
+        color: #8b949e;
+      }
+
+      .input-box input,
+      .input-box select {
+        padding: 6px 10px;
+        font-size: 1em;
+        border-radius: 6px;
+        border: none;
+        width: 100%;
+        background-color: #0d1117;
+        color: #c9d1d9;
+        text-align: center;
+      }
+
+      body.light-mode .input-box {
+        background: #ffffff;
+        box-shadow: 0 0 8px rgba(0,0,0,0.05);
+      }
+
+      body.light-mode .input-box label {
+        color: #444;
+      }
+
+      body.light-mode .input-box input,
+      body.light-mode .input-box select {
+        background-color: #f0f0f0;
+        color: #000;
+      }
+      @keyframes flash {
+        0%   { background-color: transparent; }
+        50%  { background-color: #23863655; }
+        100% { background-color: transparent; }
+      }
+      #completionPrompt {
+        animation: fadein 0.5s ease;
+      }
+
+      @keyframes fadein {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
+
+
+
+
+  </style>
+</head>
+<body>
+    <button class="btn" onclick="toggleTheme()" id="themeBtn">Light Mode</button>
+
+  <h1>Aurora Focus Timer</h1>
+
+  <div id="inputFields">
+    <div class="input-box">
+      <label for="workInput">🎯 Focus (min)</label>
+      <input type="number" id="workInput" value="5" min="1" onchange="updateDisplayedTime()">
+    </div>
+
+    <div class="input-box">
+      <label for="breakInput">☕ Break (min)</label>
+      <input type="number" id="breakInput" value="5" min="1">
+    </div>
+
+    <div class="input-box">
+      <label for="soundSelect">🌊 Background Sound</label>
+      <select id="soundSelect" onchange="changeBackgroundSound()">
+        <option value="ocean">Ocean Waves</option>
+        <option value="rain">Rain</option>
+        <option value="forest">Forest Birds</option>
+      </select>
+    </div>
+  </div>
+
+
+  <div id="timer">05:00</div>
+
+  <div id="progressContainer">
+    <div id="progressBar"></div>
+    <div id="progressPercent">0%</div>
+  </div>
+  <div id="affirmation">You are calm and focused.</div>
+  <div id="completionPrompt" style="display:none; margin-top: 20px;">
+    <div id="quoteMessage" style="font-size: 1.2em; margin-bottom: 10px;">You just invested 100% in your focus 💥</div>
+    <button class="btn" onclick="repeatRound()">🔁 Repeat</button>
+    <button class="btn" onclick="completeSession()">🏁 Finish</button>
+  </div>
+
+  <button class="btn" id="exitFullscreenBtn" onclick="exitFullscreen()" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 10;">Return</button>
+
+  <div id="controls">
+    <button class="btn" onclick="startTimer()">Start</button>
+    <button class="btn" onclick="enterFullscreen()">Fullscreen</button>
+    <button class="btn" onclick="pauseTimer()" id="pauseBtn">Pause</button>
+    <button class="btn" onclick="resetTimer()">Reset</button>
+  </div>
+
+  <audio id="background" loop>
+    <source id="bgSource" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_13e6bfa6d2.mp3?filename=ocean-waves-ambient-11075.mp3" type="audio/mp3" />
+  </audio>
+
+  <audio id="beep">
+    <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
+  </audio>
+
+  <script>
+    window.auroraAffirmations = window.auroraAffirmations || [
+      "You are calm and focused.",
+      "Your mind is clear.",
+      "You are making progress.",
+      "This moment is yours."
+    ];
+
+    let interval = null;
+    let paused = false;
+    let remainingTime = 0;
+    let totalTime = 0;
+    let sessionCycle = 0;
+    let storedCallback = null;
+
+    function updateDisplayedTime() {
+      const mins = parseInt(document.getElementById("workInput").value);
+      const display = `${mins.toString().padStart(2, '0')}:00`;
+      document.getElementById("timer").innerText = display;
+    }
+
+    function startTimer() {
+        sessionCycle = 0;
+        paused = false;
+        document.getElementById("timer").classList.add("large");
+        playBackground();
+        startWork();
+    }
+
+
+    function pauseTimer() {
+      paused = !paused;
+      const btn = document.getElementById("pauseBtn");
+      btn.innerText = paused ? "Continue" : "Pause";
+    }
+
+    function resetTimer() {
+      document.getElementById("pauseBtn").innerText = "Pause";
+      clearInterval(interval);
+      paused = false;
+      document.getElementById("controls").classList.remove("hidden");
+      updateDisplayedTime();
+      updateProgressBar(0);
+      document.getElementById("timer").classList.remove("large");
+      document.getElementById("affirmation").innerText = "You are calm and focused.";
+      stopBackground();
+    }
+
+    function startWork() {
+      updateAffirmation();
+      const workDuration = parseInt(document.getElementById("workInput").value) * 60;
+      startCountdown(workDuration, startBreak);
+    }
+
+      function startBreak() {
+        const breakDuration = parseInt(document.getElementById("breakInput").value) * 60;
+
+        if (sessionCycle >= 3) {
+          // Final session completed — end everything now
+          endSession();
+          return;
+        }
+
+        if (breakDuration <= 0) {
+          document.getElementById("affirmation").innerText = "⏩ Skipping break... Let’s keep going.";
+          sessionCycle++;
+          setTimeout(startWork, 1000); // Small delay so message is visible
+          return;
+        }
+
+        document.getElementById("affirmation").innerText = "☕ Take a short break.";
+        startCountdown(breakDuration, () => {
+          sessionCycle++;
+          startWork();
+        });
+      }
+
+
+      
+      function endSession() {
+        stopBackground();
+        playBeep();
+
+        const quoteList = [
+          "You just invested 100% in your focus 💥",
+          "You stayed with it. That’s power. 🧠",
+          "This is how mastery begins. 🌱",
+          "Each session is a vote for the person you want to become. ✅"
+        ];
+        const randomQuote = quoteList[Math.floor(Math.random() * quoteList.length)];
+        document.getElementById("quoteMessage").innerText = randomQuote;
+
+        document.getElementById("affirmation").innerText = "🎉 You're done! Great job.";
+        document.getElementById("completionPrompt").style.display = "block";
+        document.getElementById("controls").classList.add("hidden");
+        document.getElementById("timer").classList.remove("large");
+      }
+      function repeatRound() {
+        document.getElementById("completionPrompt").style.display = "none";
+        document.getElementById("pauseBtn").innerText = "Pause";
+        paused = false;
+        sessionCycle = 0;
+        startWork();
+      }
+
+
+      function completeSession() {
+        document.getElementById("pauseBtn").innerText = "Pause";
+
+        document.getElementById("completionPrompt").style.display = "none";
+        document.getElementById("controls").classList.remove("hidden");
+        document.getElementById("affirmation").innerText = "Take a deep breath and enjoy your success. 🧘‍♂️";
+        updateDisplayedTime();
+        updateProgressBar(0);
+      }
+
+
+
+    function startCountdown(duration, callback) {
+      clearInterval(interval);
+      remainingTime = duration;
+      totalTime = duration;
+      storedCallback = callback;
+      updateProgressBar(0);
+      tick();
+      interval = setInterval(tick, 1000);
+    }
+
+    function tick() {
+      if (paused) return;
+
+      const minutes = Math.floor(remainingTime / 60);
+      const seconds = remainingTime % 60;
+      document.getElementById("timer").innerText =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      const progress = ((totalTime - remainingTime) / totalTime) * 100;
+      updateProgressBar(progress);
+
+      if (remainingTime <= 0) {
+        clearInterval(interval);
+        updateProgressBar(100);
+        playBeep();
+        storedCallback();
+      }
+      remainingTime--;
+    }
+
+    function updateProgressBar(percent) {
+      const bar = document.getElementById("progressBar");
+      const text = document.getElementById("progressPercent");
+      bar.style.width = `${percent}%`;
+      text.innerText = `${Math.floor(percent)}%`;
+    }
+
+    function updateAffirmation() {
+      const affirmations = window.auroraAffirmations;
+      const index = Math.floor(Math.random() * affirmations.length);
+      document.getElementById("affirmation").innerText = affirmations[index];
+    }
+
+    function playBackground() {
+      const bg = document.getElementById("background");
+      bg.volume = 0.3;
+      bg.play();
+    }
+
+    function stopBackground() {
+      document.getElementById("background").pause();
+    }
+
+    function playBeep() {
+      const beep = document.getElementById("beep");
+      beep.volume = 1.0;
+      beep.play();
+    }
+      function enterFullscreen() {
+        const docElm = document.documentElement;
+        if (docElm.requestFullscreen) {
+          docElm.requestFullscreen();
+        } else if (docElm.webkitRequestFullscreen) {
+          docElm.webkitRequestFullscreen(); // Safari
+        } else if (docElm.mozRequestFullScreen) {
+          docElm.mozRequestFullScreen(); // Firefox
+        } else if (docElm.msRequestFullscreen) {
+          docElm.msRequestFullscreen(); // IE/Edge
+        }
+        document.body.classList.add("fullscreen-mode");
+        document.getElementById("exitFullscreenBtn").style.display = "block";
+      }
+
+      function exitFullscreen() {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen(); // Safari
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen(); // Firefox
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen(); // IE/Edge
+        }
+      }
+
+      // 💡 Handles both user and programmatic exit
+      document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) {
+          document.body.classList.remove("fullscreen-mode");
+          document.getElementById("exitFullscreenBtn").style.display = "none";
+        }
+      });
+      
+      function toggleTheme() {
+        const body = document.body;
+        const themeBtn = document.getElementById("themeBtn");
+
+        body.classList.toggle("light-mode");
+
+        const isLight = body.classList.contains("light-mode");
+        themeBtn.innerText = isLight ? "Dark Mode" : "Light Mode";
+
+        // Optional: remember preference
+        localStorage.setItem("aurora-theme", isLight ? "light" : "dark");
+      }
+
+
+
+    function changeBackgroundSound() {
+      const sound = document.getElementById("soundSelect").value;
+      const source = document.getElementById("bgSource");
+      const bg = document.getElementById("background");
+      let url = "";
+      if (sound === "ocean") url = "https://cdn.pixabay.com/download/audio/2022/03/15/audio_13e6bfa6d2.mp3?filename=ocean-waves-ambient-11075.mp3";
+      else if (sound === "rain") url = "https://cdn.pixabay.com/download/audio/2023/06/13/audio_cfd319bf10.mp3?filename=rain-ambience-14977.mp3";
+      else if (sound === "forest") url = "https://cdn.pixabay.com/download/audio/2021/08/04/audio_c7f2b9b6b6.mp3?filename=birds-in-forest-ambient-nature-sound-112200.mp3";
+
+      source.src = url;
+      bg.load();
+      bg.play();
+    }
+
+      window.onload = () => {
+        updateDisplayedTime();
+
+        const savedTheme = localStorage.getItem("aurora-theme");
+        if (savedTheme === "light") {
+          document.body.classList.add("light-mode");
+          document.getElementById("themeBtn").innerText = "Dark Mode";
+        }
+      };
+
+  </script>
+</body>
+</html>
