@@ -202,10 +202,21 @@
         to   { opacity: 1; }
       }
 
+      .fullscreen-mode #inputFields {
+        display: none !important;
+      }
+      .btn-start {
+        background-color: #238636; /* green */
+      }
 
-
+      .btn-stop {
+        background-color: #da3633; /* red */
+      }
 
   </style>
+  <script src="affirmations.js"></script>
+  <script src="your-main-script.js"></script>
+
 </head>
 <body>
     <button class="btn" onclick="toggleTheme()" id="themeBtn">Light Mode</button>
@@ -217,6 +228,12 @@
       <label for="workInput">🎯 Focus (min)</label>
       <input type="number" id="workInput" value="5" min="1" onchange="updateDisplayedTime()">
     </div>
+
+    <div class="input-box">
+      <label for="breakInput">🧘Focus on:</label>
+      <input type="text" id="focusTask" placeholder="e.g. meditation, workout" />
+    </div>
+ 
 
     <div class="input-box">
       <label for="breakInput">☕ Break (min)</label>
@@ -250,10 +267,11 @@
   <button class="btn" id="exitFullscreenBtn" onclick="exitFullscreen()" style="display:none; position: fixed; top: 20px; right: 20px; z-index: 10;">Return</button>
 
   <div id="controls">
-    <button class="btn" onclick="startTimer()">Start</button>
+     <button class="btn" onclick="startOrStop()" id="startBtn">Start</button>
+     
     <button class="btn" onclick="enterFullscreen()">Fullscreen</button>
-    <button class="btn" onclick="pauseTimer()" id="pauseBtn">Pause</button>
-    <button class="btn" onclick="resetTimer()">Reset</button>
+    <button class="btn" onclick="pauseTimer()" id="pauseBtn" style="display:none;">Pause</button>
+    <button class="btn" onclick="resetTimer()" id="resetBtn" style="display:none;">Reset</button>
   </div>
 
   <audio id="background" loop>
@@ -263,7 +281,8 @@
   <audio id="beep">
     <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
   </audio>
-
+  <div id="focusHistoryContainer" style="margin-top: 10px;"></div>
+  <div id="historyContainer"></div>
   <script>
     window.auroraAffirmations = window.auroraAffirmations || [
       "You are calm and focused.",
@@ -289,9 +308,29 @@
         sessionCycle = 0;
         paused = false;
         document.getElementById("timer").classList.add("large");
+        const task = document.getElementById("focusTask").value.trim();
+        if (task) saveFocusTask(task); // 🔥 Save the task if it's not empty
+        // Show Pause and Reset
+        document.getElementById("pauseBtn").style.display = "inline-block";
+        document.getElementById("resetBtn").style.display = "inline-block";
+        
         playBackground();
         startWork();
+        saveFocusTask();
+
     }
+      
+      function saveFocusTask() {
+        const task = document.getElementById("focusTask").value.trim();
+        if (!task) return;
+
+        let history = JSON.parse(localStorage.getItem("focusHistory") || "[]");
+        history = [task, ...history.filter(t => t !== task)]; // Remove duplicates, latest first
+        if (history.length > 5) history = history.slice(0, 5); // Keep last 5
+
+        localStorage.setItem("focusHistory", JSON.stringify(history));
+        renderFocusHistory();
+      }
 
 
     function pauseTimer() {
@@ -310,34 +349,63 @@
       document.getElementById("timer").classList.remove("large");
       document.getElementById("affirmation").innerText = "You are calm and focused.";
       stopBackground();
+      document.getElementById("pauseBtn").style.display = "none";
+      document.getElementById("resetBtn").style.display = "none";
+      // Reset Start/Stop button
+      const startBtn = document.getElementById("startBtn");
+      startBtn.innerText = "Start";
+      startBtn.classList.remove("btn-stop");
+      startBtn.classList.add("btn-start");
+
     }
 
     function startWork() {
       updateAffirmation();
       const workDuration = parseInt(document.getElementById("workInput").value) * 60;
       startCountdown(workDuration, startBreak);
+      const task = document.getElementById("focusTask").value.trim();
+      if (task) {
+        document.getElementById("affirmation").innerText = `Now focusing on: ${task}`;
+      } else {
+        updateAffirmation();
+      }
+
     }
 
       function startBreak() {
-        const breakDuration = parseInt(document.getElementById("breakInput").value) * 60;
+        // Ask if user wants a break
+        document.getElementById("completionPrompt").innerHTML = `
+          <div id="quoteMessage" style="font-size: 1.2em; margin-bottom: 10px;">
+            🎉 Focus session complete!
+          </div>
+          <button class="btn" onclick="startRealBreak()">🧘 Yes, take a short break</button>
+          <button class="btn" onclick="endSession()">❌ No, skip break</button>
+        `;
+        document.getElementById("completionPrompt").style.display = "block";
+        document.getElementById("controls").classList.add("hidden");
+        document.getElementById("timer").classList.remove("large");
+         }
 
-        if (sessionCycle >= 3) {
-          // Final session completed — end everything now
-          endSession();
-          return;
-        }
+      function startRealBreak() {
+        const userInput = prompt("How many minutes would you like your break to be?", "5");
+        const breakLength = parseInt(userInput);
 
-        if (breakDuration <= 0) {
+        if (isNaN(breakLength) || breakLength <= 0) {
           document.getElementById("affirmation").innerText = "⏩ Skipping break... Let’s keep going.";
           sessionCycle++;
-          setTimeout(startWork, 1000); // Small delay so message is visible
+          setTimeout(startWork, 1000); // Small pause before restarting
           return;
         }
 
-        document.getElementById("affirmation").innerText = "☕ Take a short break.";
-        startCountdown(breakDuration, () => {
+        document.getElementById("completionPrompt").style.display = "none";
+        document.getElementById("affirmation").innerText = "Take a short break.";
+        startCountdown(breakLength * 60, () => {
           sessionCycle++;
-          startWork();
+          if (sessionCycle < 4) {
+            startWork();
+          } else {
+            endSession();
+          }
         });
       }
 
@@ -420,10 +488,11 @@
     }
 
     function updateAffirmation() {
-      const affirmations = window.auroraAffirmations;
-      const index = Math.floor(Math.random() * affirmations.length);
-      document.getElementById("affirmation").innerText = affirmations[index];
+        const affirmations = window.auroraAffirmations;
+        const index = Math.floor(Math.random() * affirmations.length);
+        document.getElementById("affirmation").innerText = affirmations[index];
     }
+
 
     function playBackground() {
       const bg = document.getElementById("background");
@@ -504,16 +573,122 @@
       bg.play();
     }
 
+      
+
+      function startOrStop() {
+        const btn = document.getElementById("startBtn");
+
+        if (btn.innerText === "Start") {
+          startTimer();
+          btn.innerText = "Stop";
+          btn.classList.remove("btn-start");
+          btn.classList.add("btn-stop");
+        } else {
+          stopTimer();
+          btn.innerText = "Start";
+          btn.classList.remove("btn-stop");
+          btn.classList.add("btn-start");
+        }
+      }
+
+      function stopTimer() {
+        clearInterval(interval);
+        paused = false;
+        stopBackground();
+        document.getElementById("timer").classList.remove("large");
+        updateDisplayedTime();
+        updateProgressBar(0);
+        document.getElementById("affirmation").innerText = "You are calm and focused.";
+        document.getElementById("pauseBtn").innerText = "Pause";
+        document.getElementById("completionPrompt").style.display = "none";
+        document.getElementById("controls").classList.remove("hidden");
+        document.getElementById("pauseBtn").style.display = "none";
+        document.getElementById("resetBtn").style.display = "none";
+
+      }
+    
+
+      function renderFocusHistory() {
+        const container = document.getElementById("focusHistoryContainer");
+        const history = JSON.parse(localStorage.getItem("focusHistory") || "[]");
+
+        if (history.length === 0) {
+          container.innerHTML = "";
+          return;
+        }
+
+        container.innerHTML = `
+          <div style="margin-top: 10px; opacity: 0.7;">Recent Focus:</div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 5px;">
+            ${history.map(task => `
+              <button class="btn" style="background:#444;" onclick="setFocusTask('${task}')">${addTaskEmoji(task)}</button>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      function setFocusTask(task) {
+        document.getElementById("focusTask").value = task;
+      }
+      function addTaskEmoji(task) {
+        const keywords = {
+          meditation: "🧘",
+          yoga: "🧘‍♀️",
+          breathwork: "🌬️",
+          workout: "💪",
+          gym: "🏋️",
+          run: "🏃",
+          walk: "🚶",
+          stretch: "🤸",
+          email: "📧",
+          meeting: "📅",
+          work: "💼",
+          coding: "💻",
+          programming: "👨‍💻",
+          design: "🎨",
+          writing: "✍️",
+          journal: "📓",
+          reading: "📚",
+          study: "📖",
+          research: "🔍",
+          cooking: "👨‍🍳",
+          cleaning: "🧹",
+          laundry: "🧺",
+          organize: "🗂️",
+          relax: "🛋️",
+          nap: "😴",
+          prayer: "🙏",
+          music: "🎵",
+          guitar: "🎸",
+          piano: "🎹",
+          drawing: "🖌️",
+          painting: "🖼️",
+          call: "📞",
+          shopping: "🛒",
+          gardening: "🪴"
+        };
+
+        const word = task.toLowerCase();
+        for (const key in keywords) {
+          if (word.includes(key)) return `${keywords[key]} ${task}`;
+        }
+        return `✨ ${task}`;
+      }
+
+      function setFocusTask(task) {
+        document.getElementById("focusTask").value = task;
+      }
+
+      
       window.onload = () => {
         updateDisplayedTime();
-
+        renderFocusHistory();
         const savedTheme = localStorage.getItem("aurora-theme");
         if (savedTheme === "light") {
           document.body.classList.add("light-mode");
           document.getElementById("themeBtn").innerText = "Dark Mode";
         }
       };
-
   </script>
 </body>
 </html>
