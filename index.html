@@ -1,5 +1,4 @@
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -124,7 +123,7 @@
 </head>
 <body>
 
-<h1 id="pageHeader">Focus Timer</h1>
+<h1 id="pageHeader">Temporizador de Concentración</h1>
 
 <div class="timer-container">
   <div class="inputs" id="timeInputs">
@@ -152,11 +151,12 @@
       <option value="linear-gradient(135deg, #7f8c8d, #95a5a6)">Gray Mist</option>
       <option value="linear-gradient(135deg, #f1c40f, #f39c12)">Sunny Yellow</option>
   </select>
-<select id="soundSelect">
-  <option value="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">Beep+</option>
+  <select id="soundSelect">
+  <option value="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">Beep</option>
   <option value="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg">Digital Alarm</option>
   <option value="https://freesound.org/data/previews/403/403007_5121236-lq.wav">Alert</option>
 </select>
+
   <select id="languageSelect">
     <option value="/">English</option>
     <option value="/es/">Español</option>
@@ -166,17 +166,16 @@
   <button class="reset-btn" id="resetBtn">Reset</button>
 </div>
 
-<audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
+<audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
 <script>
 // Fallback translations to prevent ReferenceError if translations.js fails
 window.translations = window.translations || {
-  en: { title: 'Focus Timer', reset: 'Reset', alertTimeUp: 'Time is up!', metaDesc: 'Online focus timer to boost your productivity, track your work sessions, and stay concentrated.' },
-  es: { title: 'Temporizador de Concentración', reset: 'Reiniciar', alertTimeUp: '¡Se acabó el tiempo!', metaDesc: 'Temporizador de concentración en línea para mejorar tu productividad y mantener el enfoque.' },
-  fr: { title: 'Minuteur Focus', reset: 'Réinitialiser', alertTimeUp: 'Temps écoulé !', metaDesc: 'Minuteur de concentration en ligne pour suivre vos sessions de travail et rester concentré.' },
-  uk: { title: 'Таймер Фокусу', reset: 'Скинути', alertTimeUp: 'Час вийшов!', metaDesc: 'Онлайн таймер для фокусування, щоб підвищити продуктивність та підтримувати концентрацію.' }
+  en: { title: 'Focus Timer', reset: 'Reset', alertTimeUp: 'Time is up!' },
+  es: { title: 'Temporizador de Concentración', reset: 'Reiniciar', alertTimeUp: '¡Se acabó el tiempo!' },
+  fr: { title: 'Minuteur Focus', reset: 'Réinitialiser', alertTimeUp: 'Temps écoulé !' },
+  uk: { title: 'Таймер Фокусу', reset: 'Скинути', alertTimeUp: 'Час вийшов!' }
 };
-
 
 let timerDisplay = document.getElementById('timer');
 let playBtn = document.getElementById('playBtn');
@@ -197,8 +196,6 @@ if (!window.translations[lang]) lang = 'en';
 document.title = window.translations[lang].title;
 document.getElementById('pageHeader').textContent = window.translations[lang].title;
 resetBtn.textContent = window.translations[lang].reset;
-// Update meta description
-document.getElementById('metaDescription').setAttribute('content', window.translations[lang].metaDesc);
 
 let totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
 let timerInterval = null;
