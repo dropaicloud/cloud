@@ -208,16 +208,22 @@ function updateDisplay(seconds) {
 }
 
 function toggleTimer() {
-  if(isRunning) {
+  if (isRunning) {
+    // Pause
     clearInterval(timerInterval);
     timerInterval = null;
     isRunning = false;
     playBtn.textContent = '▶';
   } else {
-    totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
+    // Resume or start
+    // Only set totalTime if timer hasn't started yet
+    if (totalTime <= 0) {
+      totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
+    }
     timeInputsDiv.style.display = 'none';
+
     timerInterval = setInterval(() => {
-      if(totalTime > 0) {
+      if (totalTime > 0) {
         totalTime--;
         updateDisplay(totalTime);
       } else {
@@ -228,13 +234,15 @@ function toggleTimer() {
         timeInputsDiv.style.display = 'flex';
         alarmSound.src = soundSelect.value;
         alarmSound.play();
-        document.getElementById('message').textContent = window.translations[lang].alertTimeUp;
+        // Optional: show alert
       }
     }, 1000);
+
     isRunning = true;
     playBtn.textContent = '⏸';
   }
 }
+
 
 function resetTimer() {
   clearInterval(timerInterval);
