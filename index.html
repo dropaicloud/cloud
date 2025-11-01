@@ -182,11 +182,12 @@
 <script>
 // Fallback translations to prevent ReferenceError if translations.js fails
 window.translations = window.translations || {
-  en: { title: 'Focus Timer', reset: 'Reset', alertTimeUp: 'Time is up!' },
-  es: { title: 'Temporizador de Concentración', reset: 'Reiniciar', alertTimeUp: '¡Se acabó el tiempo!' },
-  fr: { title: 'Minuteur Focus', reset: 'Réinitialiser', alertTimeUp: 'Temps écoulé !' },
-  uk: { title: 'Таймер Фокусу', reset: 'Скинути', alertTimeUp: 'Час вийшов!' }
+  en: { title: 'Focus Timer', reset: 'Reset', alertTimeUp: 'Time is up!', metaDesc: 'Online focus timer to boost your productivity, track your work sessions, and stay concentrated.' },
+  es: { title: 'Temporizador de Concentración', reset: 'Reiniciar', alertTimeUp: '¡Se acabó el tiempo!', metaDesc: 'Temporizador de concentración en línea para mejorar tu productividad y mantener el enfoque.' },
+  fr: { title: 'Minuteur Focus', reset: 'Réinitialiser', alertTimeUp: 'Temps écoulé !', metaDesc: 'Minuteur de concentration en ligne pour suivre vos sessions de travail et rester concentré.' },
+  uk: { title: 'Таймер Фокусу', reset: 'Скинути', alertTimeUp: 'Час вийшов!', metaDesc: 'Онлайн таймер для фокусування, щоб підвищити продуктивність та підтримувати концентрацію.' }
 };
+
 
 let timerDisplay = document.getElementById('timer');
 let playBtn = document.getElementById('playBtn');
