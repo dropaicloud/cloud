@@ -1,26 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="pageTitle">Focus Timer</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="canonical" href="https://www.dropai.cloud/" />
-<link rel="alternate" hreflang="en" href="https://www.dropai.cloud/" />
-<link rel="alternate" hreflang="es" href="https://www.dropai.cloud/es/" />
-<link rel="alternate" hreflang="fr" href="https://www.dropai.cloud/fr/" />
-<link rel="alternate" hreflang="uk" href="https://www.dropai.cloud/uk/" />
-<meta name="description" id="metaDescription" content="">
-<script src="/translations.js" defer></script>
-<script defer>
-  let lang = window.location.pathname.split('/')[1] || 'en';
-  if (!window.translations[lang]) lang = 'en';
+  <!-- Only one meta description -->
+  <meta name="description" id="metaDescription" content="">
 
-  document.title = window.translations[lang].title;
-  document.getElementById('pageTitle').textContent = window.translations[lang].title;
-  document.getElementById('metaDescription').setAttribute('content', window.translations[lang].metaDesc);
-</script>
- 
+  <title id="pageTitle">Focus Timer</title>
+
+  <link rel="canonical" href="https://www.dropai.cloud/" />
+  <link rel="alternate" hreflang="en" href="https://www.dropai.cloud/" />
+  <link rel="alternate" hreflang="es" href="https://www.dropai.cloud/es/" />
+  <link rel="alternate" hreflang="fr" href="https://www.dropai.cloud/fr/" />
+  <link rel="alternate" hreflang="uk" href="https://www.dropai.cloud/uk/" />
+
+  <script src="/translations.js" defer></script>
+
+  <script>
+    // Fallback translations in case translations.js fails to load
+    window.translations = window.translations || {
+      en: { title: 'Focus Timer', reset: 'Reset', alertTimeUp: 'Time is up!', metaDesc: 'Online focus timer to boost your productivity, track your work sessions, and stay concentrated.' },
+      es: { title: 'Temporizador de Concentración', reset: 'Reiniciar', alertTimeUp: '¡Se acabó el tiempo!', metaDesc: 'Temporizador de concentración en línea para mejorar tu productividad y mantener el enfoque.' },
+      fr: { title: 'Minuteur Focus', reset: 'Réinitialiser', alertTimeUp: 'Temps écoulé !', metaDesc: 'Minuteur de concentration en ligne pour suivre vos sessions de travail et rester concentré.' },
+      uk: { title: 'Таймер Фокусу', reset: 'Скинути', alertTimeUp: 'Час вийшов!', metaDesc: 'Онлайн таймер для фокусування, щоб підвищити продуктивність та підтримувати концентрацію.' }
+    };
+
+    // Wait until translations.js is loaded
+    window.addEventListener('load', () => {
+      let lang = window.location.pathname.split('/')[1] || 'en';
+      if (!window.translations[lang]) lang = 'en';
+
+      const title = window.translations[lang].title;
+      const metaDesc = window.translations[lang].metaDesc;
+
+      // Update page title
+      document.title = title;
+      document.getElementById('pageTitle').textContent = title;
+      document.getElementById('pageHeader').textContent = title;
+
+      // Update meta description
+      document.getElementById('metaDescription').setAttribute('content', metaDesc);
+    });
+  </script>
+
 <style>
   body {
     font-family: Arial, sans-serif;
