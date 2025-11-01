@@ -11,8 +11,17 @@
 <link rel="alternate" hreflang="es" href="https://www.dropai.cloud/es/" />
 <link rel="alternate" hreflang="fr" href="https://www.dropai.cloud/fr/" />
 <link rel="alternate" hreflang="uk" href="https://www.dropai.cloud/uk/" />
- <script src="/translations.js"></script>
+<meta name="description" id="metaDescription" content="">
+<script src="/translations.js"></script>
+<script>
+  let lang = window.location.pathname.split('/')[1] || 'en';
+  if (!window.translations[lang]) lang = 'en';
 
+  document.title = window.translations[lang].title;
+  document.getElementById('pageTitle').textContent = window.translations[lang].title;
+  document.getElementById('metaDescription').setAttribute('content', window.translations[lang].metaDesc);
+</script>
+ 
 <style>
   body {
     font-family: Arial, sans-serif;
