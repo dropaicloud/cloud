@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -227,7 +227,7 @@ function toggleTimer() {
         timeInputsDiv.style.display = 'flex';
         alarmSound.src = soundSelect.value;
         alarmSound.play();
-        alert(window.translations[lang].alertTimeUp);
+        document.getElementById('message').textContent = window.translations[lang].alertTimeUp;
       }
     }, 1000);
     isRunning = true;
