@@ -152,9 +152,12 @@
       <option value="linear-gradient(135deg, #f1c40f, #f39c12)">Sunny Yellow</option>
   </select>
   <select id="soundSelect">
-    <option value="https://www.soundjay.com/button/beep-07.mp3">Beep</option>
-    <option value="https://www.soundjay.com/button/button-3.mp3">Button Click</option>
-    <option value="https://www.soundjay.com/button/button-09.mp3">Alert</option>
+   <select id="soundSelect">
+  <option value="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">Beep</option>
+  <option value="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg">Digital Alarm</option>
+  <option value="https://freesound.org/data/previews/403/403007_5121236-lq.wav">Alert</option>
+</select>
+
   </select>
   <select id="languageSelect">
     <option value="/">English</option>
@@ -165,7 +168,7 @@
   <button class="reset-btn" id="resetBtn">Reset</button>
 </div>
 
-<audio id="alarmSound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+<audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
 <script>
 // Fallback translations to prevent ReferenceError if translations.js fails
