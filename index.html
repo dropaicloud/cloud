@@ -297,24 +297,24 @@ updateDisplay(totalTime);
   <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon.svg" width="40" alt="YouTube">
 </div>
 
-<!-- YouTube Floating Widget Toggle -->
-<button id="ytWidgetToggle" style="position:fixed;bottom:20px;right:20px;width:50px;height:50px;border:none;background:#ff0000;border-radius:50%;cursor:pointer;">
-  <!-- Можно вставить SVG прямо сюда -->
+<!-- YouTube Audio Widget Toggle -->
+<button id="ytWidgetToggle" class="yt-widget-btn">
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" viewBox="0 0 24 24">
     <path d="M10 16.5l6-4.5-6-4.5v9z"/>
   </svg>
 </button>
 
-<!-- Виджет YouTube -->
-<div id="ytWidget" style="display:none;position:fixed;bottom:80px;right:20px;width:320px;height:180px;background:#000;border-radius:12px;padding:10px;box-shadow:0 4px 10px rgba(0,0,0,0.5);z-index:1000;">
-  <input id="ytLinkInput" type="text" placeholder="Paste YouTube link" style="width:100%;margin-bottom:5px;">
-  <button id="ytPlayPauseBtn" style="width:100%;margin-bottom:5px;">Play</button>
-  <input type="range" id="ytVolume" min="0" max="100" value="50" style="width:100%;">
-  <div id="ytPlayerContainer"></div>
+<!-- YouTube Audio Widget -->
+<div id="ytWidget" class="yt-widget">
+  <input id="ytLinkInput" type="text" placeholder="Paste YouTube link">
+  <button id="ytPlayPauseBtn">Play</button>
+  <input type="range" id="ytVolume" min="0" max="100" value="50">
+  <input type="range" id="ytProgress" min="0" max="100" value="0">
 </div>
 
 <!-- YouTube API -->
 <script src="https://www.youtube.com/iframe_api"></script>
+
 <script src="youtubeWidget.js" defer></script>
 
 
