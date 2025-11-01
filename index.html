@@ -286,18 +286,50 @@ updateDisplay(totalTime);
   ▶
 </div>
 
-<!-- YouTube Player Container -->
-<div id="youtubePlayerContainer" style="position:fixed; bottom:80px; right:20px; width:320px; height:200px; background:#000; display:none; flex-direction:column; padding:5px; border-radius:10px; z-index:1000; cursor:move;">
-  <input type="text" id="youtubeLinkInput" placeholder="Paste YouTube link" style="width:100%; padding:5px; margin-bottom:5px; border-radius:5px; border:none;">
-  <div id="youtubeControls" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-    <button id="ytPlayPauseBtn">Play</button>
-    <input type="range" id="ytVolume" min="0" max="100" value="50">
-    <button id="ytMinimizeBtn">_</button>
-  </div>
-  <div id="youtubePlayer"></div>
+<!-- Мини-иконка YouTube -->
+<div id="ytWidgetToggle" style="
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    cursor:pointer;
+    z-index:9999;
+    transition: transform 0.3s;">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon.svg" width="40" alt="YouTube">
 </div>
 
-<script src="youtubeWidget.js" defer></script>
+<!-- Плавающий виджет -->
+<div id="ytWidget" style="
+    position:fixed;
+    width:320px;
+    height:180px;
+    background:#000;
+    display:none;
+    z-index:9999;
+    border-radius:12px;
+    overflow:hidden;
+    padding:5px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.5);
+    transition: all 0.3s;">
+  <input type="text" id="ytLinkInput" placeholder="Paste YouTube link" style="
+      width:100%;
+      margin-bottom:5px;
+      padding:5px;
+      border-radius:5px;
+      border:none;
+      font-size:14px;">
+  <div id="ytPlayerContainer" style="width:100%;height:120px;background:#000;"></div>
+  <div style="display:flex;justify-content:space-between;margin-top:5px;">
+    <button id="ytPlayPauseBtn" style="flex:1;margin-right:5px;">Play</button>
+    <input type="range" id="ytVolume" min="0" max="100" value="50" style="flex:1;">
+  </div>
+</div>
+
+<!-- Подключение YouTube API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<!-- Подключение внешнего JS виджета -->
+<script src="youtubeWidgetSmart.js" defer></script>
+
 
 </body>
 </html>
