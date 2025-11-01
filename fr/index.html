@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Minuteur de concentration</title>
+<link rel="canonical" href="https://www.dropai.cloud/fr/" />
+<link rel="alternate" hreflang="en" href="https://www.dropai.cloud/" />
+<link rel="alternate" hreflang="es" href="https://www.dropai.cloud/es/" />
+<link rel="alternate" hreflang="fr" href="https://www.dropai.cloud/fr/" />
+<link rel="alternate" hreflang="uk" href="https://www.dropai.cloud/uk/" />
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1abc9c, #3498db);
+    transition: background 0.5s;
+    position: relative;
+  }
+  h1 {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    color: #fff;
+    font-size: 28px;
+    margin: 0;
+  }
+  .timer-container {
+    background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    width: 350px;
+    color: #fff;
+    backdrop-filter: blur(10px);
+    text-align: center;
+  }
+  .timer-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  .timer-display {
+    font-size: 80px;
+    font-weight: bold;
+  }
+  .play-btn {
+    font-size: 28px;
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .play-btn:hover {
+    opacity: 0.7;
+  }
+  .inputs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 15px;
+    font-size: 24px;
+  }
+  input[type=number] {
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    font-size: 24px;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    width: 80px;
+    text-align: center;
+  }
+  .theme-container {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  select {
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    display: none;
+  }
+  select option {
+    color: #000;
+  }
+  .reset-btn, .settings-btn {
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  .reset-btn:hover, .settings-btn:hover {
+    opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+
+<h1 id="pageHeader">Minuteur de concentration</h1>
+
+<div class="timer-container">
+  <div class="inputs" id="timeInputs">
+    <input type="number" id="minutesInput" value="25" min="0" max="120">
+    <span>:</span>
+    <input type="number" id="secondsInput" value="0" min="0" max="59">
+  </div>
+  <div class="timer-wrapper">
+    <div class="timer-display" id="timer">25:00</div>
+    <button class="play-btn" id="playBtn">▶</button>
+  </div>
+</div>
+
+<div class="theme-container">
+  <button class="settings-btn" id="settingsBtn">⚙️</button>
+  <select id="themeSelect">
+      <option value="linear-gradient(135deg, #1abc9c, #3498db)">Turquoise Blue</option>
+      <option value="linear-gradient(135deg, #9b59b6, #8e44ad)">Purple Dream</option>
+      <option value="linear-gradient(135deg, #e74c3c, #c0392b)">Red Sunset</option>
+      <option value="linear-gradient(135deg, #f39c12, #d35400)">Orange Glow</option>
+      <option value="linear-gradient(135deg, #2ecc71, #27ae60)">Green Forest</option>
+      <option value="linear-gradient(135deg, #34495e, #2c3e50)">Dark Ocean</option>
+      <option value="linear-gradient(135deg, #16a085, #1abc9c)">Aqua Flow</option>
+      <option value="linear-gradient(135deg, #2980b9, #3498db)">Blue Horizon</option>
+      <option value="linear-gradient(135deg, #7f8c8d, #95a5a6)">Gray Mist</option>
+      <option value="linear-gradient(135deg, #f1c40f, #f39c12)">Sunny Yellow</option>
+  </select>
+  <select id="soundSelect">
+    <option value="https://www.soundjay.com/button/beep-07.mp3">Beep</option>
+    <option value="https://www.soundjay.com/button/button-3.mp3">Button Click</option>
+    <option value="https://www.soundjay.com/button/button-09.mp3">Alert</option>
+  </select>
+  <select id="languageSelect">
+    <option value="/">English</option>
+    <option value="/es/">Español</option>
+    <option value="/fr/">Français</option>
+    <option value="/uk/">Українська</option>
+  </select>
+  <button class="reset-btn" id="resetBtn">Réinitialiser</button>
+</div>
+
+<audio id="alarmSound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+
+<script>
+// Fallback translations to prevent ReferenceError if translations.js fails
+window.translations = window.translations || {
+  en: { title: 'Focus Timer', reset: 'Reset', alertTimeUp: 'Time is up!' },
+  es: { title: 'Temporizador de Concentración', reset: 'Reiniciar', alertTimeUp: '¡Se acabó el tiempo!' },
+  fr: { title: 'Minuteur Focus', reset: 'Réinitialiser', alertTimeUp: 'Temps écoulé !' },
+  uk: { title: 'Таймер Фокусу', reset: 'Скинути', alertTimeUp: 'Час вийшов!' }
+};
+
+let timerDisplay = document.getElementById('timer');
+let playBtn = document.getElementById('playBtn');
+let minutesInput = document.getElementById('minutesInput');
+let secondsInput = document.getElementById('secondsInput');
+let timeInputsDiv = document.getElementById('timeInputs');
+let themeSelect = document.getElementById('themeSelect');
+let resetBtn = document.getElementById('resetBtn');
+let settingsBtn = document.getElementById('settingsBtn');
+let soundSelect = document.getElementById('soundSelect');
+let languageSelect = document.getElementById('languageSelect');
+let alarmSound = document.getElementById('alarmSound');
+
+// Detect language from URL
+let lang = window.location.pathname.split('/')[1] || 'en';
+if (!window.translations[lang]) lang = 'en';
+
+document.title = window.translations[lang].title;
+document.getElementById('pageHeader').textContent = window.translations[lang].title;
+resetBtn.textContent = window.translations[lang].reset;
+
+let totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
+let timerInterval = null;
+let isRunning = false;
+
+function updateDisplay(seconds) {
+  let m = Math.floor(seconds / 60);
+  let s = seconds % 60;
+  timerDisplay.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
+
+function toggleTimer() {
+  if(isRunning) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    isRunning = false;
+    playBtn.textContent = '▶';
+  } else {
+    totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
+    timeInputsDiv.style.display = 'none';
+    timerInterval = setInterval(() => {
+      if(totalTime > 0) {
+        totalTime--;
+        updateDisplay(totalTime);
+      } else {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        isRunning = false;
+        playBtn.textContent = '▶';
+        timeInputsDiv.style.display = 'flex';
+        alarmSound.src = soundSelect.value;
+        alarmSound.play();
+        alert(window.translations[lang].alertTimeUp);
+      }
+    }, 1000);
+    isRunning = true;
+    playBtn.textContent = '⏸';
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  isRunning = false;
+  playBtn.textContent = '▶';
+  timeInputsDiv.style.display = 'flex';
+  totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
+  updateDisplay(totalTime);
+}
+
+settingsBtn.addEventListener('click', () => {
+  themeSelect.style.display = themeSelect.style.display === 'inline-block' ? 'none' : 'inline-block';
+  soundSelect.style.display = soundSelect.style.display === 'inline-block' ? 'none' : 'inline-block';
+  languageSelect.style.display = languageSelect.style.display === 'inline-block' ? 'none' : 'inline-block';
+});
+
+playBtn.addEventListener('click', toggleTimer);
+resetBtn.addEventListener('click', resetTimer);
+
+minutesInput.addEventListener('input', () => {
+  totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
+  updateDisplay(totalTime);
+});
+secondsInput.addEventListener('input', () => {
+  totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
+  updateDisplay(totalTime);
+});
+
+themeSelect.addEventListener('change', () => { document.body.style.background = themeSelect.value; });
+soundSelect.addEventListener('change', () => { alarmSound.src = soundSelect.value; });
+languageSelect.addEventListener('change', () => { window.location.href = languageSelect.value; });
+
+updateDisplay(totalTime);
+</script>
+
+</body>
+</html>
