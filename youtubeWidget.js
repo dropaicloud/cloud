@@ -1,66 +1,81 @@
-let youtubeWidget = document.getElementById('youtubeWidget');
-let playerContainer = document.getElementById('youtubePlayerContainer');
-let linkInput = document.getElementById('youtubeLinkInput');
-let playPauseBtn = document.getElementById('ytPlayPauseBtn');
-let volumeSlider = document.getElementById('ytVolume');
-let minimizeBtn = document.getElementById('ytMinimizeBtn');
 let player;
 
-// Load YouTube IFrame API
-let tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-document.body.appendChild(tag);
-
-// Toggle widget visibility
-youtubeWidget.addEventListener('click', () => {
-  playerContainer.style.display = playerContainer.style.display === 'flex' ? 'none' : 'flex';
-});
-
-// Minimize/maximize button
-minimizeBtn.addEventListener('click', () => {
-  playerContainer.style.height = playerContainer.style.height === '40px' ? '200px' : '40px';
-});
-
-// Drag functionality
-let isDragging = false;
-let offsetX, offsetY;
-playerContainer.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  offsetX = e.clientX - playerContainer.getBoundingClientRect().left;
-  offsetY = e.clientY - playerContainer.getBoundingClientRect().top;
-});
-document.addEventListener('mousemove', (e) => {
-  if (isDragging) {
-    playerContainer.style.left = `${e.clientX - offsetX}px`;
-    playerContainer.style.top = `${e.clientY - offsetY}px`;
-  }
-});
-document.addEventListener('mouseup', () => { isDragging = false; });
-
-// Initialize YouTube player
+// Создание YouTube плеера
 function onYouTubeIframeAPIReady() {
-  player = new YT.Player('youtubePlayer', {
-    height: '150',
+  player = new YT.Player('ytPlayerContainer', {
+    height: '120',
     width: '320',
     videoId: localStorage.getItem('ytVideoId') || '',
-    events: { 'onReady': onPlayerReady }
+    playerVars: { autoplay: 0, controls: 0 },
+    events: {
+      onReady: () => {
+        if(localStorage.getItem('ytVolume')){
+          player.setVolume(localStorage.getItem('ytVolume'));
+          document.getElementById('ytVolume').value = localStorage.getItem('ytVolume');
+        }
+      }
+    }
   });
 }
 
-function onPlayerReady(event) {
-  let volume = localStorage.getItem('ytVolume') || 50;
-  event.target.setVolume(volume);
-  if (localStorage.getItem('ytVideoId')) {
-    event.target.playVideo();
-    playPauseBtn.textContent = 'Pause';
+// Элементы виджета
+const toggleBtn = document.getElementById('ytWidgetToggle');
+const ytWidget = document.getElementById('ytWidget');
+const linkInput = document.getElementById('ytLinkInput');
+const playPauseBtn = document.getElementById('ytPlayPauseBtn');
+const volumeSlider = document.getElementById('ytVolume');
+const timerContainer = document.querySelector('.timer-container');
+
+// Получение видео ID из ссылки
+function extractVideoId(url){
+  let videoId = '';
+  if(url.includes('v=')){
+    videoId = url.split('v=')[1].split('&')[0];
+  } else if(url.includes('youtu.be/')){
+    videoId = url.split('youtu.be/')[1].split('?')[0];
   }
+  return videoId;
 }
 
-// Play/Pause button
+// Умное позиционирование виджета
+function updateWidgetPosition(){
+  const rect = timerContainer.getBoundingClientRect();
+  let top = rect.top - ytWidget.offsetHeight - 10; // над таймером
+  if(top < 10) top = rect.bottom + 10; // если мало места сверху, разместить снизу
+  let left = rect.right - ytWidget.offsetWidth;
+  if(left < 10) left = 10;
+  ytWidget.style.top = top + 'px';
+  ytWidget.style.left = left + 'px';
+}
+
+// Показ/скрытие виджета
+toggleBtn.addEventListener('click', () => {
+  if(ytWidget.style.display === 'none'){
+    updateWidgetPosition();
+    ytWidget.style.display = 'block';
+    toggleBtn.style.transform = 'rotate(20deg)';
+  } else {
+    ytWidget.style.display = 'none';
+    toggleBtn.style.transform = 'rotate(0deg)';
+  }
+});
+
+// Обновление позиции при изменении окна
+window.addEventListener('resize', updateWidgetPosition);
+
+// Вставка видео
+linkInput.addEventListener('change', () => {
+  let videoId = extractVideoId(linkInput.value);
+  if(!videoId) return;
+  player.loadVideoById(videoId);
+  player.playVideo();
+  playPauseBtn.textContent = 'Pause';
+  localStorage.setItem('ytVideoId', videoId);
+});
+
+// Play/Pause
 playPauseBtn.addEventListener('click', () => {
-  if (!player) return;
-  let state = player.getPlayerState();
-  if (state === YT.PlayerState.PLAYING) {
+  if(player.getPlayerState() === YT.PlayerState.PLAYING){
     player.pauseVideo();
     playPauseBtn.textContent = 'Play';
   } else {
@@ -69,36 +84,38 @@ playPauseBtn.addEventListener('click', () => {
   }
 });
 
-// Volume control
+// Громкость
 volumeSlider.addEventListener('input', () => {
-  if (player) player.setVolume(volumeSlider.value);
+  player.setVolume(volumeSlider.value);
   localStorage.setItem('ytVolume', volumeSlider.value);
 });
 
-// Load video from link
-linkInput.addEventListener('change', () => {
-  let url = linkInput.value;
-  let videoId = url.split('v=')[1];
-  if (!videoId) return;
-  videoId = videoId.split('&')[0];
-  if (player) {
-    player.loadVideoById(videoId);
-    player.playVideo();
-    playPauseBtn.textContent = 'Pause';
-    localStorage.setItem('ytVideoId', videoId);
-  }
-});
+// Следим за таймером и подстраиваем виджет
+const observer = new MutationObserver(updateWidgetPosition);
+observer.observe(timerContainer, { attributes: true, childList: true, subtree: true });
 
-// Mobile friendly resize
-function resizePlayer() {
-  if(window.innerWidth < 400){
-    playerContainer.style.width = '90%';
-    playerContainer.style.right = '5%';
-    playerContainer.style.height = '180px';
-  } else {
-    playerContainer.style.width = '320px';
-    playerContainer.style.height = '200px';
+// 🟢 Дополнительно: делаем виджет перетаскиваемым
+ytWidget.onmousedown = function(e) {
+  let shiftX = e.clientX - ytWidget.getBoundingClientRect().left;
+  let shiftY = e.clientY - ytWidget.getBoundingClientRect().top;
+
+  function moveAt(pageX, pageY) {
+    ytWidget.style.left = pageX - shiftX + 'px';
+    ytWidget.style.top = pageY - shiftY + 'px';
   }
-}
-window.addEventListener('resize', resizePlayer);
-resizePlayer();
+
+  function onMouseMove(e) {
+    moveAt(e.pageX, e.pageY);
+  }
+
+  document.addEventListener('mousemove', onMouseMove);
+
+  ytWidget.onmouseup = function() {
+    document.removeEventListener('mousemove', onMouseMove);
+    ytWidget.onmouseup = null;
+  };
+};
+
+ytWidget.ondragstart = function() {
+  return false;
+};
