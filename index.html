@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Focus Timer</title>
+<title id="pageTitle">Focus Timer</title>
 <link rel="canonical" href="https://www.dropai.cloud/" />
 <link rel="alternate" hreflang="en" href="https://www.dropai.cloud/" />
 <link rel="alternate" hreflang="es" href="https://www.dropai.cloud/es/" />
@@ -123,7 +123,7 @@
 </head>
 <body>
 
-<h1>Focus Timer</h1>
+<h1 id="pageHeader">Focus Timer</h1>
 
 <div class="timer-container">
   <div class="inputs" id="timeInputs">
@@ -168,6 +168,14 @@
 <audio id="alarmSound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
 
 <script>
+// Fallback translations to prevent ReferenceError if translations.js fails
+window.translations = window.translations || {
+  en: { title: 'Focus Timer', reset: 'Reset', alertTimeUp: 'Time is up!' },
+  es: { title: 'Temporizador de Concentración', reset: 'Reiniciar', alertTimeUp: '¡Se acabó el tiempo!' },
+  fr: { title: 'Minuteur Focus', reset: 'Réinitialiser', alertTimeUp: 'Temps écoulé !' },
+  uk: { title: 'Таймер Фокусу', reset: 'Скинути', alertTimeUp: 'Час вийшов!' }
+};
+
 let timerDisplay = document.getElementById('timer');
 let playBtn = document.getElementById('playBtn');
 let minutesInput = document.getElementById('minutesInput');
@@ -179,6 +187,14 @@ let settingsBtn = document.getElementById('settingsBtn');
 let soundSelect = document.getElementById('soundSelect');
 let languageSelect = document.getElementById('languageSelect');
 let alarmSound = document.getElementById('alarmSound');
+
+// Detect language from URL
+let lang = window.location.pathname.split('/')[1] || 'en';
+if (!window.translations[lang]) lang = 'en';
+
+document.title = window.translations[lang].title;
+document.getElementById('pageHeader').textContent = window.translations[lang].title;
+resetBtn.textContent = window.translations[lang].reset;
 
 let totalTime = parseInt(minutesInput.value) * 60 + parseInt(secondsInput.value);
 let timerInterval = null;
@@ -211,7 +227,7 @@ function toggleTimer() {
         timeInputsDiv.style.display = 'flex';
         alarmSound.src = soundSelect.value;
         alarmSound.play();
-        alert('Time is up!');
+        alert(window.translations[lang].alertTimeUp);
       }
     }, 1000);
     isRunning = true;
