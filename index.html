@@ -122,62 +122,7 @@
   .reset-btn:hover, .settings-btn:hover {
     opacity: 0.7;
   }
-  .yt-widget-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border: none;
-  border-radius: 50%;
-  background: #ff0000;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-  z-index: 1000;
-}
-
-.yt-widget {
-  display: none;
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  width: 250px;
-  padding: 15px;
-  background: rgba(0,0,0,0.85);
-  color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 1000;
-  font-family: Arial, sans-serif;
-}
-
-#ytLinkInput {
-  padding: 6px 8px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-  font-size: 14px;
-}
-
-#ytPlayPauseBtn {
-  padding: 6px 0;
-  border-radius: 8px;
-  border: none;
-  background: #ff4444;
-  color: #fff;
-  cursor: pointer;
-}
-
-#ytVolume, #ytProgress {
-  width: 100%;
-}
-
+ 
 </style>
 </head>
 <body>
@@ -341,37 +286,6 @@ updateDisplay(totalTime);
 <div id="youtubeWidget" style="position:fixed; bottom:20px; right:20px; width:50px; height:50px; background:#ff0000; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; z-index:1000;">
   ▶
 </div>
-
-<!-- Мини-иконка YouTube -->
-<div id="ytWidgetToggle" style="
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    cursor:pointer;
-    z-index:9999;
-    transition: transform 0.3s;">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon.svg" width="40" alt="YouTube">
-</div>
-
-<!-- YouTube Audio Widget Toggle -->
-<button id="ytWidgetToggle" class="yt-widget-btn">
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" viewBox="0 0 24 24">
-    <path d="M10 16.5l6-4.5-6-4.5v9z"/>
-  </svg>
-</button>
-
-<!-- YouTube Audio Widget -->
-<div id="ytWidget" class="yt-widget">
-  <input id="ytLinkInput" type="text" placeholder="Paste YouTube link">
-  <button id="ytPlayPauseBtn">Play</button>
-  <input type="range" id="ytVolume" min="0" max="100" value="50">
-  <input type="range" id="ytProgress" min="0" max="100" value="0">
-</div>
-
-<!-- YouTube API -->
-<script src="https://www.youtube.com/iframe_api"></script>
-
-<script src="youtubeWidget.js" defer></script>
 
 
 </body>
