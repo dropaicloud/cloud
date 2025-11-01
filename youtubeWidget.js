@@ -1,4 +1,5 @@
 let player;
+let playerReady = false;
 
 // Создание YouTube плеера
 function onYouTubeIframeAPIReady() {
@@ -9,6 +10,7 @@ function onYouTubeIframeAPIReady() {
     playerVars: { autoplay: 0, controls: 0 },
     events: {
       onReady: () => {
+        playerReady = true;
         if(localStorage.getItem('ytVolume')){
           player.setVolume(localStorage.getItem('ytVolume'));
           document.getElementById('ytVolume').value = localStorage.getItem('ytVolume');
@@ -66,7 +68,7 @@ window.addEventListener('resize', updateWidgetPosition);
 // Вставка видео
 linkInput.addEventListener('change', () => {
   let videoId = extractVideoId(linkInput.value);
-  if(!videoId) return;
+  if(!videoId || !playerReady) return;
   player.loadVideoById(videoId);
   player.playVideo();
   playPauseBtn.textContent = 'Pause';
@@ -75,6 +77,7 @@ linkInput.addEventListener('change', () => {
 
 // Play/Pause
 playPauseBtn.addEventListener('click', () => {
+  if(!playerReady) return;
   if(player.getPlayerState() === YT.PlayerState.PLAYING){
     player.pauseVideo();
     playPauseBtn.textContent = 'Play';
@@ -86,7 +89,7 @@ playPauseBtn.addEventListener('click', () => {
 
 // Громкость
 volumeSlider.addEventListener('input', () => {
-  player.setVolume(volumeSlider.value);
+  if(playerReady) player.setVolume(volumeSlider.value);
   localStorage.setItem('ytVolume', volumeSlider.value);
 });
 
@@ -94,7 +97,7 @@ volumeSlider.addEventListener('input', () => {
 const observer = new MutationObserver(updateWidgetPosition);
 observer.observe(timerContainer, { attributes: true, childList: true, subtree: true });
 
-// 🟢 Дополнительно: делаем виджет перетаскиваемым
+// Делаем виджет перетаскиваемым
 ytWidget.onmousedown = function(e) {
   let shiftX = e.clientX - ytWidget.getBoundingClientRect().left;
   let shiftY = e.clientY - ytWidget.getBoundingClientRect().top;
